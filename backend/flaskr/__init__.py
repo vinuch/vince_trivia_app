@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
 
-from models import setup_db, Question, Category
+from models import setup_db, Question, Category, db
 
 QUESTIONS_PER_PAGE = 10
 
@@ -22,7 +22,7 @@ def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
   setup_db(app)
-  cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+  cors = CORS(app, resources={r"/*": {"origins": "*"}})
   
   @app.after_request
   def after_request(response):
@@ -44,6 +44,8 @@ def create_app(test_config=None):
   '''
   @app.route('/questions')
   def get_questions():
+    categories_selection =Category.query.all()
+    categories = [category.type for category in categories_selection]
     selection = Question.query.order_by(Question.id).all()
     current_questions = paginate_questions(request, selection)
 
@@ -53,6 +55,7 @@ def create_app(test_config=None):
       return jsonify({
         'success': True, 
         'questions': current_questions,
+        'categories': categories,
         'total_questions': len(Question.query.all())
       })
 
@@ -69,6 +72,24 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
   '''
+
+  @app.route('/categories/<int:category_id>/questions/')
+  def get_specific_category(category_id):
+    categories_selection =Category.query.all()
+    categories = [category.type for category in categories_selection]
+    selection = Question.query.filter(Question.category == category_id).order_by(Question.id).all()
+    current_questions = paginate_questions(request, selection)
+    print(selection)
+    if current_questions is None:
+      abort(404)
+    else:
+      return jsonify({
+        'success': True, 
+        'questions': current_questions,
+        'categories': categories,
+        'current_category': Category.query.get(category_id).type,
+        'total_questions': len(current_questions)
+      }), 200
 
   '''
   @TODO: 
