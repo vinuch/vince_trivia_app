@@ -52,16 +52,29 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'Not found')
 
 
-    def test_get_questions_by_category(self):
-        res = self.client().get('/categories/3/questions/')
+    # def test_get_questions_by_category(self):
+    #     res = self.client().get('/categories/3/questions/')
+    #     data = json.loads(res.data)
+        
+    #     self.assertEqual(res.status_code, 200)
+    #     self.assertEqual(data['success'], True)
+    #     self.assertTrue(data['total_questions'])
+    #     self.assertTrue(data['categories'])
+    #     self.assertTrue(data['current_categories'])
+    #     self.assertTrue(len(data['questions']))
+
+    def test_create_question(self):
+        res = self.client().post('/questions', json= {
+        "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?",
+        "answer": "Apollo 13",
+        "difficulty": 1,
+        "category": 1,
+        })
         data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(data['total_questions'])
-        self.assertTrue(data['categories'])
-        self.assertTrue(data['current_categories'])
-        self.assertTrue(len(data['questions']))
+  
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

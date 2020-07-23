@@ -96,12 +96,13 @@ def create_app(test_config=None):
     question = Question.query.get(question_id)
     try:
       question.delete()
+    except:
+      abort(422)
+    else: 
       return jsonify({
         'success': True,
         'deleted': question_id
       }), 200
-    except:
-      abort(422)
 
   '''
   @TODO: 
@@ -113,6 +114,19 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+  @app.route('/questions', methods=['POST'])
+  def add_question():
+    res = request.get_json()
+    new_question = Question(res['question'], res['answer'], res['category'], res['difficulty'])
+    try:
+      new_question.insert()
+    except:
+      abort(422)
+    else: 
+      return jsonify({
+        'success': True,
+        'new_question': new_question.format()
+      }), 200
 
   '''
   @TODO: 
