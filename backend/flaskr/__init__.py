@@ -37,11 +37,11 @@ def create_app(test_config=None):
   # @TODO: Use the after_request decorator to set Access-Control-Allow
   # '''
 
-  '''
-  @TODO: 
-  Create an endpoint to handle GET requests 
-  for all available categories.
-  '''
+  # '''
+  # @TODO: 
+  # Create an endpoint to handle GET requests 
+  # for all available categories.
+  # '''
   
   @app.route('/categories', methods=['GET'])
   def get_categories():
@@ -54,18 +54,18 @@ def create_app(test_config=None):
     })
 
 
-  '''
-  @TODO: 
-  Create an endpoint to handle GET requests for questions, 
-  including pagination (every 10 questions). 
-  This endpoint should return a list of questions, 
-  number of total questions, current category, categories. 
+  # '''
+  # @TODO: 
+  # Create an endpoint to handle GET requests for questions, 
+  # including pagination (every 10 questions). 
+  # This endpoint should return a list of questions, 
+  # number of total questions, current category, categories. 
 
-  TEST: At this point, when you start the application
-  you should see questions and categories generated,
-  ten questions per page and pagination at the bottom of the screen for three pages.
-  Clicking on the page numbers should update the questions. 
-  '''
+  # TEST: At this point, when you start the application
+  # you should see questions and categories generated,
+  # ten questions per page and pagination at the bottom of the screen for three pages.
+  # Clicking on the page numbers should update the questions. 
+  # '''
   @app.route('/questions')
   def get_questions():
     categories_selection =Category.query.all()
@@ -104,21 +104,26 @@ def create_app(test_config=None):
         'deleted': question_id
       }), 200
 
-  '''
-  @TODO: 
-  Create an endpoint to POST a new question, 
-  which will require the question and answer text, 
-  category, and difficulty score.
+  # '''
+  # @TODO: 
+  # Create an endpoint to POST a new question, 
+  # which will require the question and answer text, 
+  # category, and difficulty score.
 
-  TEST: When you submit a question on the "Add" tab, 
-  the form will clear and the question will appear at the end of the last page
-  of the questions list in the "List" tab.  
-  '''
+  # TEST: When you submit a question on the "Add" tab, 
+  # the form will clear and the question will appear at the end of the last page
+  # of the questions list in the "List" tab.  
+  # '''
   @app.route('/questions', methods=['POST'])
   def add_question():
     res = request.get_json()
-    new_question = Question(res['question'], res['answer'], res['category'], res['difficulty'])
+    new_question = res.get('question', None)
+    new_question_answer = res.get('answer', None)
+    new_question_category = res.get('category', None)
+    new_question_dificulty = res.get('difficulty', None)
+    search = res.get('search', None)
     try:
+      new_question = Question(question=new_question, answer=new_question_answer, category=new_question_category, difficulty=new_question_dificulty)
       new_question.insert()
     except:
       abort(422)
@@ -128,30 +133,43 @@ def create_app(test_config=None):
         'new_question': new_question.format()
       }), 200
 
-  '''
-  @TODO: 
-  Create a POST endpoint to get questions based on a search term. 
-  It should return any questions for whom the search term 
-  is a substring of the question. 
+  # '''
+  # @TODO: 
+  # Create a POST endpoint to get questions based on a search term. 
+  # It should return any questions for whom the search term 
+  # is a substring of the question. 
 
-  TEST: Search by any phrase. The questions list will update to include 
-  only question that include that string within their question. 
-  Try using the word "title" to start. 
-  '''
+  # TEST: Search by any phrase. The questions list will update to include 
+  # only question that include that string within their question. 
+  # Try using the word "title" to start. 
+  # '''
+  @app.route('/questions/search', methods=['POST'])
+  def search_questions():
+    body = request.get_json()
+    search = body.get('searchTerm', None)
+    
+    selection = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search)))
+    questions = paginate_questions(request, selection)
 
-  '''
-  @TODO: 
-  Create a GET endpoint to get questions based on category. 
+    return jsonify({
+          'success': True,
+          'questions': questions,
+          'totalQuestions': len(selection.all()),
+          'currentCategory': '' })
 
-  TEST: In the "List" tab / main screen, clicking on one of the 
-  categories in the left column will cause only questions of that 
-  category to be shown. 
-  '''
-  @app.route('/categories/<int:category_id>/questions/')
+  # '''
+  # @TODO: 
+  # Create a GET endpoint to get questions based on category. 
+
+  # TEST: In the "List" tab / main screen, clicking on one of the 
+  # categories in the left column will cause only questions of that 
+  # category to be shown. 
+  # '''
+  @app.route('/categories/<int:category_id>', methods=['GET'])
   def get_specific_category(category_id):
     categories_selection =Category.query.all()
     categories = [category.type for category in categories_selection]
-    selection = Question.query.filter(Question.category == category_id).order_by(Question.id).all()
+    selection = Question.query.filter(Question.category == str(category_id)).order_by(Question.id).all()
     current_questions = paginate_questions(request, selection)
     print(selection)
     if current_questions is None:
@@ -176,6 +194,25 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  @app.route('/quizzes', methods=['POST'])
+  def get_quiz_questions():
+    body = request.get_json()
+    print(body)
+    questions_in_category = Question.query.filter(Question.category == int(body['quiz_category']['id']) + 1).all()
+    formated_questions = [question.format() for question in questions_in_category]
+    unanswered_questions = [item for item in formated_questions if item['id'] not in body['previous_questions']]
+    # print(random.choice(unanswered_questions))
+    if not unanswered_questions:
+      return jsonify({
+        'success': True,
+        'question': False
+      })
+    else: 
+      return jsonify({
+        'success': True,
+        'question': random.choice(unanswered_questions)
+      })
+
 
   '''
   @TODO: 

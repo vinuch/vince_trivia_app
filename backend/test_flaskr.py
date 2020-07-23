@@ -4,7 +4,7 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
-from models import setup_db, Question, Category
+from models import setup_db, Question, Category, db
 
 
 class TriviaTestCase(unittest.TestCase):
@@ -45,6 +45,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_404_sent_requesting_beyond_valid_page(self):
         res = self.client().get('/questions?page=1000')
+        print(res)
         data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 404)
@@ -52,22 +53,22 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'Not found')
 
 
-    # def test_get_questions_by_category(self):
-    #     res = self.client().get('/categories/3/questions/')
-    #     data = json.loads(res.data)
-        
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(data['total_questions'])
-    #     self.assertTrue(data['categories'])
-    #     self.assertTrue(data['current_categories'])
-    #     self.assertTrue(len(data['questions']))
+    def test_get_questions_by_category(self):
+        res = self.client().get('/categories/2')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['total_questions'])
+        self.assertTrue(data['categories'])
+        self.assertTrue(data['current_category'])
+        self.assertTrue(len(data['questions']))
 
     def test_create_question(self):
-        res = self.client().post('/questions', json= {
+        res = self.client().post('/questions', json={
         "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?",
-        "answer": "Apollo 13",
-        "difficulty": 1,
+        "answer": "Apollo",
+        "difficulty": 5,
         "category": 1,
         })
         data = json.loads(res.data)
