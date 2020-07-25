@@ -43,9 +43,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['categories'])
         self.assertTrue(len(data['questions']))
 
-    def test_404_sent_requesting_beyond_valid_page(self):
+    def test_get_questions_404_invalid_page(self):
         res = self.client().get('/questions?page=1000')
-        print(res)
         data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 404)
@@ -64,6 +63,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['current_category'])
         self.assertTrue(len(data['questions']))
 
+    def test_get_questions_by_category_404(self):
+        res = self.client().get('/categories/1000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        
+
     def test_create_question(self):
         res = self.client().post('/questions', json={
         "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?",
@@ -75,6 +81,52 @@ class TriviaTestCase(unittest.TestCase):
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
+
+
+    # def test_delete_question(self):
+    #     res = self.client().delete('/questions/15')
+    #     data = json.loads(res.data)
+        
+    #     self.assertEqual(res.status_code, 200)
+    #     self.assertEqual(data['success'], True)
+    #     self.assertEqual(data['deleted'], 15)
+
+    def test_search_question(self):
+        res = self.client().post('/questions/search', json={'searchTerm': 'title'})
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['totalQuestions'])
+        self.assertEqual(len(data['questions']), 2)
+
+    def test_search_question_not_found(self):
+        res = self.client().post('/questions/search', json={'searchTerm': 'applePineapple'})
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertFalse(data['totalQuestions'])
+        self.assertEqual(len(data['questions']), 0)
+
+
+    def test_play_quizz(self):
+        res = self.client().post('/quizzes', json={'quiz_category': {'id': 1, 'type': 'Science'}, 'previous_questions': []})
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['question'])
+
+    def test_quizz_questiion_not_found(self):
+        res = self.client().post('/quizzes', json={'quiz_category': {'id': 1000, 'type': 'Science'}, 'previous_questions': []})
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], True)
+        self.assertFalse(data['question'])
+
+        
   
 
 # Make the tests conveniently executable
