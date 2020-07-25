@@ -57,18 +57,6 @@ def create_app(test_config=None):
             'categories': categories
         })
 
-    # '''
-    # @TODO:
-    # Create an endpoint to handle GET requests for questions,
-    # including pagination (every 10 questions).
-    # This endpoint should return a list of questions,
-    # number of total questions, current category, categories.
-
-    # TEST: At this point, when you start the application
-    # you should see questions and categories generated,
-    # ten questions per page and pagination at the bottom of the screen for three pages.
-    # Clicking on the page numbers should update the questions.
-    # '''
 
     @app.route('/questions')
     def get_questions():
@@ -87,13 +75,6 @@ def create_app(test_config=None):
                 'total_questions': len(Question.query.all())
             })
 
-    '''
-  @TODO: 
-  Create an endpoint to DELETE question using a question ID. 
-
-  TEST: When you click the trash icon next to a question, the question will be removed.
-  This removal will persist in the database and when you refresh the page. 
-  '''
     @app.route('/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
         question = Question.query.get(question_id)
@@ -107,16 +88,6 @@ def create_app(test_config=None):
                 'deleted': question_id
             }), 200
 
-    # '''
-    # @TODO:
-    # Create an endpoint to POST a new question,
-    # which will require the question and answer text,
-    # category, and difficulty score.
-
-    # TEST: When you submit a question on the "Add" tab,
-    # the form will clear and the question will appear at the end of the last page
-    # of the questions list in the "List" tab.
-    # '''
     @app.route('/questions', methods=['POST'])
     def add_question():
         res = request.get_json()
