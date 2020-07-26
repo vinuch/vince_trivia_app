@@ -66,7 +66,7 @@ One note before you delve into your tasks: for each endpoint you are expected to
 8. Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions. 
 9. Create error handlers for all expected errors including 400, 404, 422 and 500. 
 
-REVIEW_COMMENT
+<!-- REVIEW_COMMENT
 ```
 This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
 
@@ -87,6 +87,222 @@ GET '/categories'
 '5' : "Entertainment",
 '6' : "Sports"}
 
+``` -->
+
+### API endpoint Docs
+
+
+##### GET '/questions'
+
+- Fetches Paginated questions
+- Request Parameters: None
+- Returns
+```
+{
+  "categories": [
+    "Science",
+    "Art",
+    "Geography",
+    "History",
+    "Entertainment",
+    "Sports"
+  ],
+  "questions": [
+    {
+      "answer": "Apollo 13",
+      "category": 5,
+      "difficulty": 4,
+      "id": 2,
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    },
+    {
+      "answer": "Tom Cruise",
+      "category": 5,
+      "difficulty": 4,
+      "id": 4,
+      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+    },
+    {
+      "answer": "Maya Angelou",
+      "category": 4,
+      "difficulty": 2,
+      "id": 5,
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    },
+    {
+      "answer": "Edward Scissorhands",
+      "category": 5,
+      "difficulty": 3,
+      "id": 6,
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    },
+    {
+      "answer": "Muhammad Ali",
+      "category": 4,
+      "difficulty": 1,
+      "id": 9,
+      "question": "What boxer's original name is Cassius Clay?"
+    },
+    {
+      "answer": "Brazil",
+      "category": 6,
+      "difficulty": 3,
+      "id": 10,
+      "question": "Which is the only team to play in every soccer World Cup tournament?"
+    },
+    {
+      "answer": "Uruguay",
+      "category": 6,
+      "difficulty": 4,
+      "id": 11,
+      "question": "Which country won the first ever soccer World Cup in 1930?"
+    },
+    {
+      "answer": "George Washington Carver",
+      "category": 4,
+      "difficulty": 2,
+      "id": 12,
+      "question": "Who invented Peanut Butter?"
+    },
+    {
+      "answer": "Lake Victoria",
+      "category": 3,
+      "difficulty": 2,
+      "id": 13,
+      "question": "What is the largest lake in Africa?"
+    },
+    {
+      "answer": "The Palace of Versailles",
+      "category": 3,
+      "difficulty": 3,
+      "id": 14,
+      "question": "In which royal palace would you find the Hall of Mirrors?"
+    }
+  ],
+  "success": true,
+  "total_questions": 24
+}
+```
+
+##### POST '/questions'
+
+- Creates new question
+- request parameters: None
+- returns
+```
+{
+  "new_question": {
+    "answer": "Apollo",
+    "category": 1,
+    "difficulty": 5,
+    "id": 31,
+    "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+  },
+  "success": true
+}
+```
+
+##### DELETE '/questions/int:question_id'
+
+- Deletes question with id in url
+- returns
+```
+{
+  "deleted": 31,
+  "success": true
+}
+```
+
+##### POST '/questions/search'
+- Fetches questions and their categories that matches with the search term
+- request Parameters: searchTerm eg: soccer
+- returns
+```
+{
+  "questions": [
+    {
+      "answer": "Brazil",
+      "category": 6,
+      "difficulty": 3,
+      "id": 10,
+      "question": "Which is the only team to play in every soccer World Cup tournament?"
+    },
+    {
+      "answer": "Uruguay",
+      "category": 6,
+      "difficulty": 4,
+      "id": 11,
+      "question": "Which country won the first ever soccer World Cup in 1930?"
+    }
+    [...] (any other questions with the search term in its question)
+  ],
+  "success": true,
+  "totalQuestions": 2
+}
+```
+
+##### GET '/categories/int:category_id (for example: 2)' 
+- Creates new question
+- request Parameters: searchTerm eg: soccer
+- returns
+```
+{
+  "categories": [
+    "Science",
+    "Art",
+    "Geography",
+    "History",
+    "Entertainment",
+    "Sports"
+  ],
+  "current_category": "Art",
+  "questions": [
+    {
+      "answer": "Escher",
+      "category": 2,
+      "difficulty": 1,
+      "id": 16,
+      "question": "Which Dutch graphic artist–initials M C was a creator of optical illusions?"
+    },
+    {
+      "answer": "Mona Lisa",
+      "category": 2,
+      "difficulty": 3,
+      "id": 17,
+      "question": "La Giaconda is better known as what?"
+    },
+    [...] (other questions in this category)
+  ],
+  "success": true,
+  "total_questions": 4
+}
+```
+
+##### POST '/quizzes' 
+- fetches new random questions to play quiz
+- Request Paramters: request body that contains (previous questions and current quiz category)
+- returns
+```
+{
+  "question": {
+    "answer": "One",
+    "category": 1,
+    "difficulty": 1,
+    "id": 24,
+    "question": "How many paintings did Van Gogh sell in his lifetime?"
+  },
+  "success": true
+}
+```
+
+##### DELETE '/questions/int:question_id ' 
+- Deletes question with matching id from db
+- returns
+```
+{
+  "deleted": 31,
+  "success": true
+}
 ```
 
 

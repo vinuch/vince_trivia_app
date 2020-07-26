@@ -95,18 +95,17 @@ def create_app(test_config=None):
         new_question_answer = res.get('answer', None)
         new_question_category = res.get('category', None)
         new_question_dificulty = res.get('difficulty', None)
-        search = res.get('search', None)
         try:
             new_question = Question(question=new_question, answer=new_question_answer,
                                     category=new_question_category, difficulty=new_question_dificulty)
             new_question.insert()
-        except:
-            abort(422)
-        else:
+            
             return jsonify({
                 'success': True,
                 'new_question': new_question.format()
             }), 200
+        except:
+            abort(422)
 
     # '''
     # @TODO:
