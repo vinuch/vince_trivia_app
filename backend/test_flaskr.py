@@ -84,6 +84,7 @@ class TriviaTestCase(unittest.TestCase):
 
 
     def test_delete_question(self):
+        # Create test question to delete
         create_question = {
             'question' : 'This is a test question right?',
             'answer' : 'Correct!!!',
@@ -95,6 +96,7 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
         question_id = data['new_question']['id'] 
 
+        # pass in the id of test question to query param of delete endpoint
         res = self.client().delete('/questions/{}'.format(question_id))
         data = json.loads(res.data)
         
@@ -133,7 +135,7 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().post('/quizzes', json={'quiz_category': {'id': 1000, 'type': 'Science'}, 'previous_questions': []})
         data = json.loads(res.data)
         
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertFalse(data['question'])
 

@@ -33,19 +33,6 @@ def create_app(test_config=None):
         response.headers.add('Access-Control-Allow-Methods',
                              'GET, POST, PATCH, DELETE, OPTIONS')
         return response
-    # '''
-    # @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-    # '''
-
-    # '''
-    # @TODO: Use the after_request decorator to set Access-Control-Allow
-    # '''
-
-    # '''
-    # @TODO:
-    # Create an endpoint to handle GET requests
-    # for all available categories.
-    # '''
 
     @app.route('/categories', methods=['GET'])
     def get_categories():
@@ -99,7 +86,7 @@ def create_app(test_config=None):
             new_question = Question(question=new_question, answer=new_question_answer,
                                     category=new_question_category, difficulty=new_question_dificulty)
             new_question.insert()
-            
+
             return jsonify({
                 'success': True,
                 'new_question': new_question.format()
@@ -107,16 +94,7 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-    # '''
-    # @TODO:
-    # Create a POST endpoint to get questions based on a search term.
-    # It should return any questions for whom the search term
-    # is a substring of the question.
 
-    # TEST: Search by any phrase. The questions list will update to include
-    # only question that include that string within their question.
-    # Try using the word "title" to start.
-    # '''
     @app.route('/questions/search', methods=['POST'])
     def search_questions():
         body = request.get_json()
@@ -135,14 +113,7 @@ def create_app(test_config=None):
                 'totalQuestions': len(selection.all()),
             }), 200
 
-    # '''
-    # @TODO:
-    # Create a GET endpoint to get questions based on category.
 
-    # TEST: In the "List" tab / main screen, clicking on one of the
-    # categories in the left column will cause only questions of that
-    # category to be shown.
-    # '''
     @app.route('/categories/<int:category_id>', methods=['GET'])
     def get_specific_category(category_id):
         categories_selection = Category.query.all()
@@ -161,43 +132,32 @@ def create_app(test_config=None):
                 'total_questions': len(current_questions)
             }), 200
 
-    '''
-  @TODO: 
-  Create a POST endpoint to get questions to play the quiz. 
-  This endpoint should take category and previous question parameters 
-  and return a random questions within the given category, 
-  if provided, and that is not one of the previous questions. 
-
-  TEST: In the "Play" tab, after a user selects "All" or a category,
-  one question at a time is displayed, the user is allowed to answer
-  and shown whether they were correct or not. 
-  '''
     @app.route('/quizzes', methods=['POST'])
     def get_quiz_questions():
         body = request.get_json()
-        questions_in_category = Question.query.filter(
-            Question.category == str(int(body['quiz_category']['id']) + 1)).all()
-        formated_questions = [question.format()
-                              for question in questions_in_category]
-        unanswered_questions = [
+        if body['quiz_category']['type'] == 'click':
+            print('all categories')
+            all_questions = Question.query.all()
+            formated_questions = [question.format() for question in all_questions]
+            unanswered_questions = [
             item for item in formated_questions if item['id'] not in body['previous_questions']]
-        # print(random.choice(unanswered_questions))
+
+        else:
+            questions_in_category = Question.query.filter(Question.category == str(int(body['quiz_category']['id']) + 1)).all()
+            formated_questions = [question.format() for question in questions_in_category]
+            unanswered_questions = [item for item in formated_questions if item['id'] not in body['previous_questions']]
+        
         if not unanswered_questions:
             return jsonify({
                 'success': True,
                 'question': False
-            }), 404
+            }), 200
         else:
             return jsonify({
                 'success': True,
                 'question': random.choice(unanswered_questions)
             }), 200
 
-    '''
-  @TODO: 
-  Create error handlers for all expected errors 
-  including 404 and 422. 
-  '''
 
     @app.errorhandler(404)
     def not_found(error):
